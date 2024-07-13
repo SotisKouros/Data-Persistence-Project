@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
+using TMPro;
 public class MainManager : MonoBehaviour
 {
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
-
+    public TextMeshProUGUI txtName;
     public Text ScoreText;
     public GameObject GameOverText;
-    
+    public Text BestScoreText;
     private bool m_Started = false;
     private int m_Points;
     
@@ -22,6 +22,8 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        txtName.text = "Name: " + DataPersistence.Instance.HighScorerName;
+        BestScoreText.text = "Best Score:" + DataPersistence.Instance.HighScore;
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -40,10 +42,16 @@ public class MainManager : MonoBehaviour
 
     private void Update()
     {
+        if (DataPersistence.Instance != null)
+        {
+            txtName.text = "Name: " + DataPersistence.Instance.HighScorerName;
+        }
         if (!m_Started)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                BestScoreText.text = "Best Score:" + DataPersistence.Instance.HighScore;
+                txtName.text = "Name: " + DataPersistence.Instance.HighScorerName;
                 m_Started = true;
                 float randomDirection = Random.Range(-1.0f, 1.0f);
                 Vector3 forceDir = new Vector3(randomDirection, 1, 0);
@@ -55,11 +63,26 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+            if (DataPersistence.Instance != null)
+            {
+                if(m_Points > DataPersistence.Instance.HighScore)
+                {
+                    DataPersistence.Instance.HighScore = m_Points;
+                    BestScoreText.text = "Best Score:" + DataPersistence.Instance.HighScore;
+                    DataPersistence.Instance.HighScorerName = DataPersistence.Instance.NameInput;
+                    txtName.text = "Name: " + DataPersistence.Instance.HighScorerName;
+                }
+                
+                
+            }
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                BestScoreText.text = "Best Score:" + DataPersistence.Instance.HighScore;
+                txtName.text = "Name: " + DataPersistence.Instance.HighScorerName;
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+
     }
 
     void AddPoint(int point)
